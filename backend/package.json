@@ -1,0 +1,26 @@
+{
+  "name": "apotekcare-backend",
+  "version": "1.0.0",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "generate": "prisma generate",
+    "db:push": "prisma db push",
+    "migrate": "prisma migrate dev --name init",
+    "seed": "node prisma/seed.js",
+    "setup": "npm run generate && npm run db:push && npm run seed"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.10.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.0",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3",
+    "prisma": "^5.10.0"
+  }
+}

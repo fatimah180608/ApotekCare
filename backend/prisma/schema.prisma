@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("customer")
+  phone     String?
+  address   String?  @db.Text
+  carts     Cart[]
+  orders    Order[]
+  createdAt DateTime @default(now())
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String
+  icon     String?
+  products Product[]
+}
+
+model Product {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String?     @db.Text
+  price       Int
+  stock       Int         @default(0)
+  categoryId  Int
+  image       String?
+  unit        String?
+  category    Category    @relation(fields: [categoryId], references: [id])
+  carts       Cart[]
+  orderItems  OrderItem[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([categoryId])
+  @@index([name])
+}
+
+model Cart {
+  id        Int     @id @default(autoincrement())
+  userId    Int
+  productId Int
+  quantity  Int     @default(1)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@index([productId])
+}
+
+model Order {
+  id               Int         @id @default(autoincrement())
+  userId           Int
+  total            Int
+  status           String      @default("Diproses")
+  deliveryMethod   String
+  courier          String?
+  trackingNumber   String?
+  address          String?     @db.Text
+  paymentMethod    String
+  paymentBank      String?
+  paymentCode      String?
+  paymentQR        String?     @db.Text
+  paymentConfirmed Boolean     @default(false)
+  paidAt           DateTime?
+  estimatedArrival DateTime?
+  completedAt      DateTime?
+  user             User        @relation(fields: [userId], references: [id])
+  items            OrderItem[]
+  createdAt        DateTime    @default(now())
+
+  @@index([userId])
+  @@index([status])
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  quantity  Int
+  price     Int
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+}
